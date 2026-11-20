@@ -1,0 +1,32 @@
+name: GeoLog
+options:
+  bundleIdPrefix: dev.geolog
+  deploymentTarget:
+    iOS: "16.0"
+packages:
+  GeoLogCore:
+    path: .
+targets:
+  GeoLog:
+    type: application
+    platform: iOS
+    sources: [App]
+    dependencies:
+      - package: GeoLogCore
+    settings:
+      base:
+        SWIFT_VERSION: "5.0"
+        PRODUCT_BUNDLE_IDENTIFIER: dev.geolog.app
+        TARGETED_DEVICE_FAMILY: "1"
+        # Set DEVELOPMENT_TEAM to your Apple team ID (or pick the team in Xcode's Signing tab).
+    info:
+      path: Generated/Info.plist
+      properties:
+        CFBundleDisplayName: GeoLog
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIBackgroundModes: [location]
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        NSLocationWhenInUseUsageDescription: GeoLog stamps each logged entry with your position.
+        NSLocationAlwaysAndWhenInUseUsageDescription: GeoLog keeps recording positions while the screen is off.
