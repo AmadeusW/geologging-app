@@ -40,15 +40,26 @@ struct ContentView: View {
     }
 
     private func keyButton(_ key: Key) -> some View {
-        Button { session.press(key) } label: {
+        let label = session.legend[key]
+        return Button { session.press(key) } label: {
             RoundedRectangle(cornerRadius: 16)
-                .fill(session.pending.contains(key) ? Color.orange : Color(white: 0.18))
+                .fill(session.pending.last == key ? Color.orange.opacity(0.5) : Color(white: label == nil ? 0.08 : 0.2))
                 .overlay(
-                    Text("\(key.keypadDigit)")
-                        .font(.system(size: 40, weight: .semibold, design: .rounded))
-                        .foregroundColor(.white)
+                    VStack(spacing: 6) {
+                        Text("\(key.keypadDigit)")
+                            .font(.system(size: 36, weight: .semibold, design: .rounded))
+                        if let label {
+                            Text(label)
+                                .font(.footnote)
+                                .multilineTextAlignment(.center)
+                                .minimumScaleFactor(0.6)
+                        }
+                    }
+                    .padding(6)
+                    .foregroundColor(label == nil ? Color(white: 0.3) : .white)
                 )
         }
         .buttonStyle(.plain)
+        .disabled(label == nil)
     }
 }

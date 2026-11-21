@@ -23,16 +23,25 @@ public enum MachineEvent: Equatable {
 public struct SequenceMachine {
     public let map: SequenceMap
     public let timeout: TimeInterval
+    /// Pressed mid-sequence, this key silently drops the pending prefix (nothing is logged).
+    /// Pressed with nothing pending, it is handled like any other key.
+    public let cancelKey: Key?
     public private(set) var prefix: [Key] = []
     private var lastPress: TimeInterval = 0
 
-    public init(map: SequenceMap = .default, timeout: TimeInterval = 1.5) {
+    public init(map: SequenceMap = .default, timeout: TimeInterval = 1.5, cancelKey: Key? = .topLeft) {
         self.map = map
         self.timeout = timeout
+        self.cancelKey = cancelKey
     }
 
     public mutating func press(_ key: Key, at now: TimeInterval) -> [MachineEvent] {
         var events = tick(at: now)
+        if key == cancelKey, !prefix.isEmpty {
+            events.append(.abandoned(prefix: prefix))
+            prefix = []
+            return events
+        }
         let candidate = prefix + [key]
 
         if map.isValidPath(candidate) {

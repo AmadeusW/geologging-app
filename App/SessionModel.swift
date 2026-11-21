@@ -31,6 +31,9 @@ final class SessionModel: ObservableObject {
         return docs.appendingPathComponent("geolog-\(f.string(from: Date())).csv")
     }()
 
+    /// What each key does from the current state, for drawing the grid.
+    var legend: [Key: String] { SequenceMap.default.legend(after: pending) }
+
     var statusLine: String {
         "entries \(entries.count) | last \(lastLabel) | gps \(location.statusText)"
     }
@@ -56,7 +59,10 @@ final class SessionModel: ObservableObject {
 
     // MARK: Input (touch and keyboard share this path)
 
+    /// Any input (touch or keyboard) brings the screen back and restarts the dim countdown.
+    /// Touches while dimmed never reach here: the overlay in ContentView swallows them.
     func press(_ key: Key) {
+        wake()
         handle(machine.press(key, at: Self.now))
     }
 

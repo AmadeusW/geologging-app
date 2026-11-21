@@ -9,7 +9,7 @@ final class SequenceMachineTests: XCTestCase {
         [.middleLeft, .middleRight]: "MR",
         [.bottomRight, .bottomRight, .bottomRight]: "Triple",
     ])
-    func machine() -> SequenceMachine { SequenceMachine(map: map, timeout: 1.0) }
+    func machine() -> SequenceMachine { SequenceMachine(map: map, timeout: 1.0, cancelKey: nil) }
 
     func testTwoKeySequenceCommits() {
         var m = machine()
@@ -107,6 +107,45 @@ final class SequenceMachineTests: XCTestCase {
             events += m.tick(at: 100)
             XCTAssertTrue(events.contains(.committed(label: label, keys: keys)), "\(label) not reachable")
         }
+    }
+}
+
+final class DefaultMapTests: XCTestCase {
+    func machine() -> SequenceMachine { SequenceMachine(map: .default, timeout: 1) }
+
+    func testSevenAloneLogsReset() {
+        var m = machine()
+        XCTAssertEqual(m.press(.topLeft, at: 0), [.committed(label: "reset", keys: [.topLeft])])
+    }
+
+    func testSevenMidSequenceCancelsWithoutLogging() {
+        var m = machine()
+        _ = m.press(.middleRight, at: 0)   // 6, pending
+        XCTAssertEqual(m.press(.topLeft, at: 0.2), [.abandoned(prefix: [.middleRight])])
+        XCTAssertEqual(m.prefix, [])
+        XCTAssertEqual(m.tick(at: 10), [])
+    }
+
+    func testSixThenOneIsIdling() {
+        var m = machine()
+        _ = m.press(.middleRight, at: 0)
+        XCTAssertEqual(m.press(.bottomLeft, at: 0.2),
+                       [.committed(label: "personal vehicle idling", keys: [.middleRight, .bottomLeft])])
+    }
+
+    func testLegendAfterNine() {
+        let l = SequenceMap.default.legend(after: [.topRight])
+        XCTAssertEqual(l[.topRight], "truck")
+        XCTAssertEqual(l[.topMiddle], "bus")
+        XCTAssertNil(l[.center])
+        XCTAssertEqual(l.count, 5)
+    }
+
+    func testTopLevelLegendHasNoAvailableKeys() {
+        let l = SequenceMap.default.legend(after: [])
+        XCTAssertNil(l[.bottomRight])   // 3
+        XCTAssertNil(l[.bottomMiddle])  // 2
+        XCTAssertEqual(l.count, 7)
     }
 }
 
