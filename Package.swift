@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "GeoLogCore",
-    platforms: [.iOS(.v16), .macOS(.v13)],
+    platforms: [.iOS("27.0"), .macOS(.v13)],
     products: [.library(name: "GeoLogCore", targets: ["GeoLogCore"])],
     targets: [
         .target(name: "GeoLogCore"),

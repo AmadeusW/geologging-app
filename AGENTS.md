@@ -9,10 +9,24 @@ Rows live in memory and are flushed to a CSV in the app's Documents folder every
 ## Layout
 - `Sources/GeoLogCore/` - pure Swift, Foundation only. `Key`, `SequenceMap` (sequence -> label),
   `SequenceMachine` (state machine, time injected), `LogEntry`/`CSV`. **All logic goes here.**
+  `Track.swift`: `TrackPoint`, `TrackSettings`, `TrackSampler` (thins ~1 Hz fixes to the sample
+  interval), `TrackCSV` (append-only format), `Track.segments` (split on gaps).
+  `Markers.swift`: `MarkerStyles` (label -> SF Symbol + colour), `MapMarker`.
 - `Tests/GeoLogCoreTests/` - XCTest. Runs on Linux and macOS with `swift test`.
-- `App/` - thin iOS shell: `SessionModel` (glue, dimming, flushing), `LocationProvider`
-  (background CoreLocation), `KeyboardMonitor` (GameController `GCKeyboard`), SwiftUI views.
-  No logic here that can be tested in Core instead.
+- `App/` - thin iOS 27 shell (SwiftUI, `@Observable`, async/await, no Combine). One file per
+  responsibility; `Session` only wires them together:
+  - Input: `KeyboardInput` (GCKeyboard -> `AsyncStream<Key>`), `KeyGrid` (touch)
+  - `SequenceRunner`: keys -> `SequenceMachine` (+ timeout tick) -> `onCommit`
+  - `EntryLog` (in memory) / `EntryLogStore` (CSV in Documents, flushed every 60 s)
+  - `LocationService`: `CLLocationUpdate.liveUpdates` + `CLBackgroundActivitySession`
+  - `TrackRecorder` (this session, thinned by `TrackSampler`) / `TrackHistory` (past sessions)
+    / `TrackStore` (append-only files, `Documents/tracks/`)
+  - `TrackMapView`: SwiftUI `Map`; MapKit provides user dot, heading, camera follow
+  - `ScreenDimmer`, `ContentView` (layout), `Storage`, `ConfigFile`
+- Map layers: past sessions (faint blue), this session (orange), logged-entry icons. User-editable
+  JSON in Documents, written with defaults on first run: `track-settings.json`
+  (`sampleInterval` default 5 s, `maxAccuracy`, `maxGap`) and `marker-styles.json` (icon per
+  label). No in-app editor for either yet.
 - `project.yml` - XcodeGen spec. The `.xcodeproj` is generated and git-ignored.
 
 ## Dev environment
@@ -20,7 +34,7 @@ Rows live in memory and are flushed to a CSV in the app's Documents folder every
   (`sudo dnf install swift-lang`), but cannot build the iOS app. Building needs macOS + Xcode:
   `brew install xcodegen && xcodegen generate && open GeoLog.xcodeproj`, set the signing team,
   run on a real iPhone (GPS/keyboard/brightness don't work in the simulator).
-- App code has NOT been compiled yet. Expect small compile fixes on the first Xcode build.
+- App code has NOT been compiled yet (Swift 5 language mode, iOS 27 deployment target). Expect small compile fixes on the first Xcode build.
 - Free Apple ID signing expires after 7 days; fine for testing.
 
 ## Behaviour requirements

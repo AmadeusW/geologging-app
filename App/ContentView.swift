@@ -1,65 +1,48 @@
 import SwiftUI
 import GeoLogCore
 
+/// Layout only: status line, key grid, map, and the black overlay shown while dimmed.
 struct ContentView: View {
-    @EnvironmentObject var session: SessionModel
+    let session: Session
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
-
             VStack(spacing: 12) {
-                Text(session.statusLine)
+                Text(statusLine)
                     .font(.footnote.monospaced())
-                    .foregroundColor(.gray)
+                    .foregroundStyle(.gray)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                Grid(horizontalSpacing: 12, verticalSpacing: 12) {
-                    ForEach(0..<3, id: \.self) { row in
-                        GridRow {
-                            ForEach(0..<3, id: \.self) { col in
-                                keyButton(Key(rawValue: row * 3 + col)!)
-                            }
-                        }
-                    }
-                }
+                KeyGrid(legend: session.sequence.legend,
+                        pending: session.sequence.pending,
+                        onPress: session.press)
+                    .frame(maxHeight: 300)
+
+                TrackMapView(pastSegments: session.history.segments,
+                             sessionSegments: session.track.segments,
+                             markers: MapMarker.markers(from: session.log.entries, styles: session.markerStyles))
+                    .clipShape(.rect(cornerRadius: 16))
+                    .frame(maxHeight: .infinity)
             }
             .padding()
 
-            // While dimmed, a black overlay swallows the first tap and just wakes the screen,
-            // so a tap in a pocket can't log an entry by accident.
-            if session.isDimmed {
+            // While dimmed, this swallows the first tap and only wakes the screen, so a tap in a
+            // pocket can't log an entry by accident.
+            if session.dimmer.isDimmed {
                 Color.black
                     .ignoresSafeArea()
-                    .contentShape(Rectangle())
-                    .onTapGesture { session.wake() }
+                    .onTapGesture { session.dimmer.wake() }
             }
         }
-        .statusBarHidden(session.isDimmed)
-        .persistentSystemOverlays(session.isDimmed ? .hidden : .automatic)
+        .background(.black)
+        .statusBarHidden(session.dimmer.isDimmed)
+        .persistentSystemOverlays(session.dimmer.isDimmed ? .hidden : .automatic)
+        .sensoryFeedback(.impact, trigger: session.log.entries.count)
     }
 
-    private func keyButton(_ key: Key) -> some View {
-        let label = session.legend[key]
-        return Button { session.press(key) } label: {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(session.pending.last == key ? Color.orange.opacity(0.5) : Color(white: label == nil ? 0.08 : 0.2))
-                .overlay(
-                    VStack(spacing: 6) {
-                        Text("\(key.keypadDigit)")
-                            .font(.system(size: 36, weight: .semibold, design: .rounded))
-                        if let label {
-                            Text(label)
-                                .font(.footnote)
-                                .multilineTextAlignment(.center)
-                                .minimumScaleFactor(0.6)
-                        }
-                    }
-                    .padding(6)
-                    .foregroundColor(label == nil ? Color(white: 0.3) : .white)
-                )
-        }
-        .buttonStyle(.plain)
-        .disabled(label == nil)
+    private var statusLine: String {
+        let gps = session.location.isDenied ? "DENIED"
+            : session.location.latest.map { "±\(Int($0.horizontalAccuracy))m" } ?? "no fix"
+        return "entries \(session.log.entries.count) | last \(session.log.lastLabel) | gps \(gps)"
     }
 }

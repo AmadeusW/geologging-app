@@ -2,14 +2,14 @@ import SwiftUI
 
 @main
 struct GeoLogApp: App {
-    @StateObject private var session = SessionModel()
+    @State private var session = Session()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(session)
-                .onChange(of: scenePhase) { phase in session.scenePhaseChanged(phase) }
+            ContentView(session: session)
+                .task { session.start() }
+                .onChange(of: scenePhase) { _, phase in session.sceneChanged(to: phase) }
         }
     }
 }
