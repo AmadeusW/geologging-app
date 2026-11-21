@@ -54,7 +54,7 @@ final class TrackTests: XCTestCase {
         let e1 = LogEntry(timestamp: t0, label: "bus", keys: [.topRight, .topMiddle], fix: fix(0))
         let e2 = LogEntry(timestamp: t0, label: "flag", keys: [.middleLeft], fix: nil)
         let e3 = LogEntry(timestamp: t0, label: "unknown", keys: [.center], fix: fix(1))
-        let m = MapMarker.markers(from: [e1, e2, e3], styles: .default)
+        let m = LogMarker.markers(from: [e1, e2, e3], styles: .default)
         XCTAssertEqual(m.map(\.id), [0, 2])
         XCTAssertEqual(m[0].style.symbol, "bus.fill")
         XCTAssertEqual(m[1].style, MarkerStyles.default.fallback)

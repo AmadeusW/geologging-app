@@ -54,7 +54,7 @@ public struct MarkerStyles: JSONConfig, Equatable {
 }
 
 /// A logged entry placed on the map.
-public struct MapMarker: Equatable, Identifiable {
+public struct LogMarker: Equatable, Identifiable {
     public var id: Int            // index in the entry list: stable, since entries are append-only
     public var label: String
     public var timestamp: Date
@@ -63,10 +63,10 @@ public struct MapMarker: Equatable, Identifiable {
     public var style: MarkerStyle
 
     /// Entries without a GPS fix cannot be placed and are skipped.
-    public static func markers(from entries: [LogEntry], styles: MarkerStyles) -> [MapMarker] {
+    public static func markers(from entries: [LogEntry], styles: MarkerStyles) -> [LogMarker] {
         entries.enumerated().compactMap { i, e in
             guard let fix = e.fix else { return nil }
-            return MapMarker(id: i, label: e.label, timestamp: e.timestamp,
+            return LogMarker(id: i, label: e.label, timestamp: e.timestamp,
                              latitude: fix.latitude, longitude: fix.longitude,
                              style: styles.style(for: e.label))
         }

@@ -20,7 +20,7 @@ struct ContentView: View {
 
                 TrackMapView(pastSegments: session.history.segments,
                              sessionSegments: session.track.segments,
-                             markers: MapMarker.markers(from: session.log.entries, styles: session.markerStyles))
+                             markers: LogMarker.markers(from: session.log.entries, styles: session.markerStyles))
                     .clipShape(.rect(cornerRadius: 16))
                     .frame(maxHeight: .infinity)
             }

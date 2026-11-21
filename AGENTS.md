@@ -11,7 +11,7 @@ Rows live in memory and are flushed to a CSV in the app's Documents folder every
   `SequenceMachine` (state machine, time injected), `LogEntry`/`CSV`. **All logic goes here.**
   `Track.swift`: `TrackPoint`, `TrackSettings`, `TrackSampler` (thins ~1 Hz fixes to the sample
   interval), `TrackCSV` (append-only format), `Track.segments` (split on gaps).
-  `Markers.swift`: `MarkerStyles` (label -> SF Symbol + colour), `MapMarker`.
+  `Markers.swift`: `MarkerStyles` (label -> SF Symbol + colour), `LogMarker`.
 - `Tests/GeoLogCoreTests/` - XCTest. Runs on Linux and macOS with `swift test`.
 - `App/` - thin iOS 27 shell (SwiftUI, `@Observable`, async/await, no Combine). One file per
   responsibility; `Session` only wires them together:

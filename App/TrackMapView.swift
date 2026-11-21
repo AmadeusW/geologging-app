@@ -7,7 +7,7 @@ import GeoLogCore
 struct TrackMapView: View {
     let pastSegments: [[TrackPoint]]
     let sessionSegments: [[TrackPoint]]
-    let markers: [MapMarker]
+    let markers: [LogMarker]
 
     @State private var camera = MapCameraPosition.userLocation(followsHeading: true, fallback: .automatic)
 
@@ -53,7 +53,7 @@ private extension TrackPoint {
     var coordinate: CLLocationCoordinate2D { .init(latitude: latitude, longitude: longitude) }
 }
 
-private extension MapMarker {
+private extension LogMarker {
     var coordinate: CLLocationCoordinate2D { .init(latitude: latitude, longitude: longitude) }
 }
 
