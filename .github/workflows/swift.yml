@@ -28,6 +28,10 @@ jobs:
         run: |
           brew install xcodegen
           xcodegen generate
+          # The runner's SDK may be older than the iOS 27 target in project.yml; the code only
+          # uses APIs from iOS 26 or earlier, so build against the SDK's own range.
+          set -o pipefail
           xcodebuild -project GeoLog.xcodeproj -scheme GeoLog \
             -destination 'generic/platform=iOS' \
-            CODE_SIGNING_ALLOWED=NO build
+            IPHONEOS_DEPLOYMENT_TARGET=26.0 \
+            CODE_SIGNING_ALLOWED=NO build | xcbeautify --renderer github-actions
