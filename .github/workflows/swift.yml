@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable   # pin (e.g. 27.0) once the runner has it
+      - name: Core tests
+        run: swift test
+      - name: Build iOS app
+        run: |
+          brew install xcodegen
+          xcodegen generate
+          xcodebuild -project GeoLog.xcodeproj -scheme GeoLog \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO build
