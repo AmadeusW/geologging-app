@@ -7,7 +7,12 @@ import Observation
 final class ScreenDimmer {
     private(set) var isDimmed = false
 
-    @ObservationIgnored private let delay = Duration.seconds(10)
+    /// Seconds, from iOS Settings > GeoLog > Display (`dimDelay`); re-read on every restart so
+    /// changes apply without relaunching. 10 s if never set.
+    @ObservationIgnored private var delay: Duration {
+        let seconds = UserDefaults.standard.object(forKey: "dimDelay") as? Double ?? 10
+        return .seconds(max(1, seconds))
+    }
     @ObservationIgnored private var savedBrightness: CGFloat = 1
     @ObservationIgnored private var countdown: Task<Void, Never>?
 
