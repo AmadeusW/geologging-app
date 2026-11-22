@@ -34,7 +34,7 @@ final class Session {
     /// Only called when the app is in the foreground, so a background relaunch by the
     /// system never starts location tracking.
     func start() {
-        guard !started else { return }
+        guard !started, UIApplication.shared.applicationState == .active else { return }
         started = true
         location.start()
         sequence.start()
