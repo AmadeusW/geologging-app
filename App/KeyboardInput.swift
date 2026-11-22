@@ -25,11 +25,15 @@ final class KeyboardInput {
         }
     }
 
-    /// Numeric keypad 7 8 9 / 4 5 6 / 1 2 3.
+    /// Numeric keypad 7 8 9 / 4 5 6 / 1 2 3, or the top-row digits (a MacBook has no keypad;
+    /// some macropads send top-row digits too).
     private static let keypad: [GCKeyCode: Int] = [
         .keypad1: 1, .keypad2: 2, .keypad3: 3,
         .keypad4: 4, .keypad5: 5, .keypad6: 6,
         .keypad7: 7, .keypad8: 8, .keypad9: 9,
+        .one: 1, .two: 2, .three: 3,
+        .four: 4, .five: 5, .six: 6,
+        .seven: 7, .eight: 8, .nine: 9,
     ]
 
     private static func key(for code: GCKeyCode) -> Key? {
