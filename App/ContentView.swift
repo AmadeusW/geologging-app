@@ -15,6 +15,7 @@ struct ContentView: View {
 
                 KeyGrid(legend: session.sequence.legend,
                         pending: session.sequence.pending,
+                        flashes: session.sequence.flashes,
                         onPress: session.press)
 
                 TrackMapView(pastSegments: session.history.segments,

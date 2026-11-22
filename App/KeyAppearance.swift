@@ -28,4 +28,11 @@ enum KeyAppearance {
     static let emojiSize: CGFloat = 40
     static let cellHeight: CGFloat = 92
     static let spacing: CGFloat = 12
+
+    // Press feedback (opacity of a white overlay on the key).
+    static let flashColor = Color.white
+    /// Intermediate key of a sequence: quick blink so the next legend is visible straight away.
+    static let stepFlash: [(opacity: Double, duration: Double)] = [(0.9, 0.04), (0, 0.18)]
+    /// Last key of a sequence (entry logged): strong, settle to medium, linger, fade out.
+    static let finalFlash: [(opacity: Double, duration: Double)] = [(1.0, 0.05), (0.5, 0.2), (0.5, 0.7), (0, 0.4)]
 }
