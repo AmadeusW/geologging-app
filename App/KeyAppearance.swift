@@ -19,6 +19,7 @@ enum KeyAppearance {
     static let flashColor = Color.white
     /// Intermediate key of a sequence: quick blink so the next legend is visible straight away.
     static let stepFlash: [(opacity: Double, duration: Double)] = [(0.9, 0.04), (0, 0.18)]
-    /// Last key of a sequence (entry logged): strong, settle to medium, linger, fade out.
-    static let finalFlash: [(opacity: Double, duration: Double)] = [(1.0, 0.05), (0.5, 0.2), (0.5, 0.7), (0, 0.4)]
+    /// Last key of a sequence (entry logged): strong, settle to medium, fade out. 0.5 s total.
+    static let finalFlash: [(opacity: Double, duration: Double)] = [(1.0, 0.05), (0.5, 0.15), (0.5, 0.1), (0, 0.2)]
+    static var finalFlashDuration: Double { finalFlash.reduce(0) { $0 + $1.duration } }
 }
