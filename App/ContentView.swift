@@ -25,6 +25,9 @@ struct ContentView: View {
                     .frame(maxHeight: .infinity)
             }
             .padding()
+            // Any touch (map pan/pinch/rotate included) restarts the dim countdown without
+            // interfering with the views underneath.
+            .simultaneousGesture(DragGesture(minimumDistance: 0).onChanged { _ in session.dimmer.wake() })
 
             // While dimmed, this swallows the first tap and only wakes the screen, so a tap in a
             // pocket can't log an entry by accident.
