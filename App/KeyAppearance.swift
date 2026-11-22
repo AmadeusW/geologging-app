@@ -23,7 +23,6 @@ enum KeyAppearance {
                         : Color(white: enabled ? 0.2 : 0.08)
     }
 
-    static let pendingFill = Color.orange.opacity(0.5)
     static let showCaption = true
     static let emojiSize: CGFloat = 40
     static let cellHeight: CGFloat = 92

@@ -26,7 +26,7 @@ struct KeyGrid: View {
         let isPending = pending.last == key
         return Button { onPress(key) } label: {
             RoundedRectangle(cornerRadius: 16)
-                .fill(isPending ? KeyAppearance.pendingFill : KeyAppearance.fill(for: key, enabled: enabled))
+                .fill(KeyAppearance.fill(for: key, enabled: enabled)
                 .frame(maxWidth: .infinity)
                 .frame(height: KeyAppearance.cellHeight)
                 .overlay { FlashOverlay(flash: flashes[key]) }
