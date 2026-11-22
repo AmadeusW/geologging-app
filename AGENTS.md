@@ -50,7 +50,7 @@ Rows live in memory and are flushed to a CSV in the app's Documents folder every
 ## State machine rules (see `SequenceMachine.swift`, covered by tests)
 - State = key prefix pressed so far. Valid path -> advance; complete entry with no longer
   extension -> commit immediately; entry that is also a prefix of a longer one -> commit on
-  timeout (1.5 s since last key) or when the next key doesn't extend it.
+  timeout (5 s default, configurable, since last key) or when the next key doesn't extend it.
 - Invalid key: pending prefix is committed (if an entry) or abandoned, then the key is retried
   as a fresh start.
 - `SequenceMap.default` implements `statemachine.md`. `cancelKey` (7): mid-sequence it drops the
@@ -62,4 +62,4 @@ Rows live in memory and are flushed to a CSV in the app's Documents folder every
    events; USB Restricted Mode may also cut the accessory after ~1 h locked. Test on device.
 2. Keypad mapping assumes numeric-keypad key codes (7 8 9 / 4 5 6 / 1 2 3). A macropad that
    sends top-row digits would need an extra mapping in `KeyboardMonitor`.
-3. Timeout value (1.5 s is a guess).
+3. Timeout value (default 5 s, configurable in iOS Settings).

@@ -22,7 +22,7 @@ public enum MachineEvent: Equatable {
 /// - If `timeout` seconds pass since the last key, the pending prefix is committed/abandoned.
 public struct SequenceMachine {
     public let map: SequenceMap
-    public let timeout: TimeInterval
+    public var timeout: TimeInterval
     /// Pressed mid-sequence, this key silently drops the pending prefix (nothing is logged).
     /// Pressed with nothing pending, it is handled like any other key.
     public let cancelKey: Key?

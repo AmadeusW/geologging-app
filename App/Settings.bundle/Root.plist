@@ -17,6 +17,18 @@
             <key>MinimumValue</key><integer>3</integer>
             <key>MaximumValue</key><integer>60</integer>
         </dict>
+        <dict>
+            <key>Type</key><string>PSGroupSpecifier</string>
+            <key>Title</key><string>Sequences</string>
+            <key>FooterText</key><string>Seconds to wait for the next key before a pending entry is logged.</string>
+        </dict>
+        <dict>
+            <key>Type</key><string>PSSliderSpecifier</string>
+            <key>Key</key><string>sequenceTimeout</string>
+            <key>DefaultValue</key><integer>5</integer>
+            <key>MinimumValue</key><integer>5</integer>
+            <key>MaximumValue</key><integer>30</integer>
+        </dict>
     </array>
 </dict>
 </plist>
