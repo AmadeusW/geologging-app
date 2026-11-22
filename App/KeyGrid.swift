@@ -24,7 +24,9 @@ struct KeyGrid: View {
         let isPending = pending.last == key
         return Button { onPress(key) } label: {
             RoundedRectangle(cornerRadius: 16)
-                .fill(isPending ? Color.orange.opacity(0.5) : Color(white: label == nil ? 0.08 : 0.2))
+                .fill(isPending ? Color.orange.opacity(0.5)
+                      : key == .topLeft ? Color.red.opacity(label == nil ? 0.15 : 0.6)   // 7 = reset/cancel
+                      : Color(white: label == nil ? 0.08 : 0.2))
                 .overlay {
                     VStack(spacing: 6) {
                         Text("\(key.keypadDigit)")
