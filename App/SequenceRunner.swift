@@ -13,7 +13,7 @@ final class SequenceRunner {
     @ObservationIgnored private var machine = SequenceMachine()
 
     /// What each key would do if pressed now.
-    var legend: [Key: String] { machine.map.legend(after: pending) }
+    var legend: [Key: String] { machine.legend }
 
     func start() {
         Task {

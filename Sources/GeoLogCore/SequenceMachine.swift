@@ -35,6 +35,13 @@ public struct SequenceMachine {
         self.cancelKey = cancelKey
     }
 
+    /// What each key would do if pressed now, including the cancel key mid-sequence.
+    public var legend: [Key: String] {
+        var l = map.legend(after: prefix)
+        if let cancelKey, !prefix.isEmpty { l[cancelKey] = "cancel" }
+        return l
+    }
+
     public mutating func press(_ key: Key, at now: TimeInterval) -> [MachineEvent] {
         var events = tick(at: now)
         if key == cancelKey, !prefix.isEmpty {

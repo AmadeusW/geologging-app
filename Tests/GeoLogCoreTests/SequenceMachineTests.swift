@@ -184,4 +184,11 @@ final class CSVTests: XCTestCase {
         XCTAssertEqual(CSV.escape("a,b"), "\"a,b\"")
         XCTAssertEqual(CSV.escape("say \"hi\""), "\"say \"\"hi\"\"\"")
     }
+
+    func testLegendShowsCancelOnlyMidSequence() {
+        var m = SequenceMachine()
+        XCTAssertEqual(m.legend[.topLeft], "reset")
+        _ = m.press(.topRight, at: 0)
+        XCTAssertEqual(m.legend[.topLeft], "cancel")
+    }
 }
