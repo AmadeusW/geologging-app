@@ -20,19 +20,28 @@ struct KeyGrid: View {
         }
     }
 
+    /// Emoji of what the key would log now. The cancel key mid-sequence has a legend label but
+    /// no entry, so it gets the cancel emoji. Greyed keys show their root-level emoji, dimmed.
+    private func emoji(for key: Key, label: String?) -> String {
+        let map = SequenceMap.default
+        if label != nil {
+            return map.label(for: pending + [key]) == nil ? SequenceMap.cancelEmoji : map.emoji(for: pending + [key])
+        }
+        return map.label(for: [key]) == nil ? "" : map.emoji(for: [key])
+    }
+
     private func keyButton(_ key: Key) -> some View {
         let label = legend[key]
         let enabled = label != nil
-        let isPending = pending.last == key
         return Button { onPress(key) } label: {
             RoundedRectangle(cornerRadius: 16)
-                .fill(KeyAppearance.fill(for: key, enabled: enabled)
+                .fill(KeyAppearance.fill(for: key, enabled: enabled))
                 .frame(maxWidth: .infinity)
                 .frame(height: KeyAppearance.cellHeight)
                 .overlay { FlashOverlay(flash: flashes[key]) }
                 .overlay {
                     VStack(spacing: 4) {
-                        Text(KeyAppearance.emoji[key] ?? "")
+                        Text(emoji(for: key, label: label))
                             .font(.system(size: KeyAppearance.emojiSize))
                             .opacity(enabled ? 1 : 0.3)
                         if KeyAppearance.showCaption {

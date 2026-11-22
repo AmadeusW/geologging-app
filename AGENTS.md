@@ -11,7 +11,8 @@ Rows live in memory and are flushed to a CSV in the app's Documents folder every
   `SequenceMachine` (state machine, time injected), `LogEntry`/`CSV`. **All logic goes here.**
   `Track.swift`: `TrackPoint`, `TrackSettings`, `TrackSampler` (thins ~1 Hz fixes to the sample
   interval), `TrackCSV` (append-only format), `Track.segments` (split on gaps).
-  `Markers.swift`: `MarkerStyles` (label -> SF Symbol + colour), `LogMarker`.
+  `Markers.swift`: `LogMarker` (entry placed on the map, emoji from `SequenceMap`).
+  `SequenceMap.default` is the one table of sequence -> label -> emoji, shared by keypad and map.
 - `Tests/GeoLogCoreTests/` - XCTest. Runs on Linux and macOS with `swift test`.
 - `App/` - thin iOS 27 shell (SwiftUI, `@Observable`, async/await, no Combine). One file per
   responsibility; `Session` only wires them together:
@@ -23,10 +24,10 @@ Rows live in memory and are flushed to a CSV in the app's Documents folder every
     / `TrackStore` (append-only files, `Documents/tracks/`)
   - `TrackMapView`: SwiftUI `Map`; MapKit provides user dot, heading, camera follow
   - `ScreenDimmer`, `ContentView` (layout), `Storage`, `ConfigFile`
-- Map layers: past sessions (faint blue), this session (orange), logged-entry icons. User-editable
-  JSON in Documents, written with defaults on first run: `track-settings.json`
-  (`sampleInterval` default 5 s, `maxAccuracy`, `maxGap`) and `marker-styles.json` (icon per
-  label). No in-app editor for either yet.
+- Map layers: past sessions (faint blue), this session (orange), logged-entry emoji markers
+  (same emoji as the keypad, from `SequenceMap.default`). User-editable JSON in Documents,
+  written with defaults on first run: `track-settings.json` (`sampleInterval` default 5 s,
+  `maxAccuracy`, `maxGap`). No in-app editor yet.
 - `project.yml` - XcodeGen spec. The `.xcodeproj` is generated and git-ignored.
 
 ## Dev environment

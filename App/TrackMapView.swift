@@ -25,7 +25,7 @@ struct TrackMapView: View {
             }
             ForEach(markers) { marker in
                 Annotation(marker.label, coordinate: marker.coordinate) {
-                    MarkerIcon(style: marker.style)
+                    MarkerIcon(emoji: marker.emoji)
                 }
             }
         }
@@ -39,11 +39,11 @@ struct TrackMapView: View {
 }
 
 private struct MarkerIcon: View {
-    let style: MarkerStyle
+    let emoji: String
 
     var body: some View {
-        Image(systemName: style.symbol)
-            .foregroundStyle(Color(hex: style.colorHex))
+        Text(emoji)
+            .font(.title3)
             .padding(6)
             .background(.white, in: .circle)
     }
@@ -55,14 +55,4 @@ private extension TrackPoint {
 
 private extension LogMarker {
     var coordinate: CLLocationCoordinate2D { .init(latitude: latitude, longitude: longitude) }
-}
-
-private extension Color {
-    /// `RRGGBB`; anything unparsable becomes white.
-    init(hex: String) {
-        let value = UInt32(hex.trimmingCharacters(in: CharacterSet(charactersIn: "#")), radix: 16) ?? 0xFFFFFF
-        self.init(red: Double((value >> 16) & 0xFF) / 255,
-                  green: Double((value >> 8) & 0xFF) / 255,
-                  blue: Double(value & 0xFF) / 255)
-    }
 }

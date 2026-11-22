@@ -32,8 +32,6 @@ final class TrackTests: XCTestCase {
         let s = TrackSettings(sampleInterval: 10, maxAccuracy: 20, maxGap: 60)
         XCTAssertEqual(TrackSettings.from(jsonData: try s.jsonData()), s)
         XCTAssertEqual(TrackSettings.from(jsonData: Data("junk".utf8)), .default)
-        let styles = MarkerStyles.default
-        XCTAssertEqual(MarkerStyles.from(jsonData: try styles.jsonData()), styles)
     }
 
     func testCSVRoundTripSkipsTornLine() {
@@ -50,27 +48,28 @@ final class TrackTests: XCTestCase {
         XCTAssertEqual(Track.segments([], maxGap: 120), [])
     }
 
-    func testMarkersSkipEntriesWithoutFixAndUseStyles() {
+    func testMarkersSkipEntriesWithoutFixAndUseEmoji() {
         let e1 = LogEntry(timestamp: t0, label: "bus", keys: [.topRight, .topMiddle], fix: fix(0))
         let e2 = LogEntry(timestamp: t0, label: "flag", keys: [.middleLeft], fix: nil)
         let e3 = LogEntry(timestamp: t0, label: "unknown", keys: [.center], fix: fix(1))
-        let m = LogMarker.markers(from: [e1, e2, e3], styles: .default)
+        let m = LogMarker.markers(from: [e1, e2, e3])
         XCTAssertEqual(m.map(\.id), [0, 2])
-        XCTAssertEqual(m[0].style.symbol, "bus.fill")
-        XCTAssertEqual(m[1].style, MarkerStyles.default.fallback)
+        XCTAssertEqual(m[0].emoji, "🚌")
+        XCTAssertEqual(m[1].emoji, SequenceMap.fallbackEmoji)
     }
 
-    func testStylesFilledKeepsUserOverrides() {
-        let custom = MarkerStyle(symbol: "star", colorHex: "000000")
-        var user = MarkerStyles(byLabel: ["bus": custom], fallback: MarkerStyles.default.fallback)
-        user = user.filled(with: .default)
-        XCTAssertEqual(user.style(for: "bus"), custom)
-        XCTAssertEqual(user.style(for: "flag"), MarkerStyles.default.style(for: "flag"))
-    }
-
-    func testDefaultStylesCoverEveryDefaultLabel() {
-        for label in SequenceMap.default.entries.values {
-            XCTAssertNotNil(MarkerStyles.default.byLabel[label], label)
+    func testEveryDefaultEntryHasAnEmoji() {
+        for keys in SequenceMap.default.entries.keys {
+            XCTAssertNotNil(SequenceMap.default.emojis[keys], "\(keys)")
         }
+        XCTAssertEqual(SequenceMap.default.emoji(for: [.middleRight, .middleRight]), "🛻")
+        XCTAssertEqual(SequenceMap.default.emoji(for: [.middleRight, .bottomMiddle]), "🏎️")
+    }
+
+    func testSharedLabelsCanHaveDifferentEmoji() {
+        let map = SequenceMap([[.topLeft]: "idling", [.topRight]: "idling"],
+                              emojis: [[.topLeft]: "💨", [.topRight]: "🚬"])
+        let e = LogEntry(timestamp: t0, label: "idling", keys: [.topRight], fix: fix(0))
+        XCTAssertEqual(LogMarker.markers(from: [e], map: map)[0].emoji, "🚬")
     }
 }

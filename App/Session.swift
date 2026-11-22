@@ -14,7 +14,6 @@ final class Session {
     let dimmer = ScreenDimmer()
     let track: TrackRecorder
     let history = TrackHistory()
-    let markerStyles: MarkerStyles
 
     private let logStore = EntryLogStore()
     private let trackStore = TrackStore()
@@ -22,9 +21,6 @@ final class Session {
 
     init() {
         trackSettings = ConfigFile<TrackSettings>(name: "track-settings.json").load()
-        let styleFile = ConfigFile<MarkerStyles>(name: "marker-styles.json")
-        markerStyles = styleFile.load().filled(with: .default)
-        styleFile.save(markerStyles)   // adds any new default labels to the user's file
         track = TrackRecorder(settings: trackSettings, store: trackStore)
 
         sequence.onCommit = { [log, location] label, keys in
