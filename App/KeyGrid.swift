@@ -8,7 +8,7 @@ struct KeyGrid: View {
     let onPress: (Key) -> Void
 
     var body: some View {
-        Grid(horizontalSpacing: 12, verticalSpacing: 12) {
+        Grid(horizontalSpacing: KeyAppearance.spacing, verticalSpacing: KeyAppearance.spacing) {
             ForEach(0..<3, id: \.self) { row in
                 GridRow {
                     ForEach(0..<3, id: \.self) { column in
@@ -21,28 +21,31 @@ struct KeyGrid: View {
 
     private func keyButton(_ key: Key) -> some View {
         let label = legend[key]
+        let enabled = label != nil
         let isPending = pending.last == key
         return Button { onPress(key) } label: {
             RoundedRectangle(cornerRadius: 16)
-                .fill(isPending ? Color.orange.opacity(0.5)
-                      : key == .topLeft ? Color.red.opacity(label == nil ? 0.15 : 0.6)   // 7 = reset/cancel
-                      : Color(white: label == nil ? 0.08 : 0.2))
+                .fill(isPending ? KeyAppearance.pendingFill : KeyAppearance.fill(for: key, enabled: enabled))
+                .frame(maxWidth: .infinity)
+                .frame(height: KeyAppearance.cellHeight)
                 .overlay {
-                    VStack(spacing: 6) {
-                        Text("\(key.keypadDigit)")
-                            .font(.system(size: 36, weight: .semibold, design: .rounded))
-                        if let label {
-                            Text(label)
-                                .font(.footnote)
-                                .multilineTextAlignment(.center)
-                                .minimumScaleFactor(0.6)
+                    VStack(spacing: 4) {
+                        Text(KeyAppearance.emoji[key] ?? "")
+                            .font(.system(size: KeyAppearance.emojiSize))
+                            .opacity(enabled ? 1 : 0.3)
+                        if KeyAppearance.showCaption {
+                            // Fixed one-line slot so captions never change the cell size.
+                            Text(label ?? " ")
+                                .font(.caption2)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                                .foregroundStyle(.white)
                         }
                     }
-                    .padding(6)
-                    .foregroundStyle(label == nil ? Color(white: 0.3) : .white)
+                    .padding(4)
                 }
         }
         .buttonStyle(.plain)
-        .disabled(label == nil)
+        .disabled(!enabled)
     }
 }

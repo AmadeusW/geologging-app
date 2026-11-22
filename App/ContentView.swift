@@ -16,7 +16,6 @@ struct ContentView: View {
                 KeyGrid(legend: session.sequence.legend,
                         pending: session.sequence.pending,
                         onPress: session.press)
-                    .frame(maxHeight: 300)
 
                 TrackMapView(pastSegments: session.history.segments,
                              sessionSegments: session.track.segments,
@@ -46,6 +45,6 @@ struct ContentView: View {
     private var statusLine: String {
         let gps = session.location.isDenied ? "DENIED"
             : session.location.latest.map { "±\(Int($0.horizontalAccuracy))m" } ?? "no fix"
-        return "entries \(session.log.entries.count) | last \(session.log.lastLabel) | gps \(gps)"
+        return "gps \(gps)"
     }
 }
