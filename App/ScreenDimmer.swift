@@ -30,11 +30,15 @@ final class ScreenDimmer {
         restartCountdown()
     }
 
+    /// Any scene change (app switcher gesture, Home, lock, notification) un-dims completely, so
+    /// the UI and the app-switcher snapshot are never black. Dimming starts over once active.
     func sceneChanged(to phase: ScenePhase) {
         if phase == .active {
-            if isDimmed { screen?.brightness = 0 } else { restartCountdown() }
-        } else if isDimmed {
-            screen?.brightness = savedBrightness   // never leave the system dark outside the app
+            restartCountdown()
+        } else {
+            countdown?.cancel()
+            if isDimmed { screen?.brightness = savedBrightness }
+            isDimmed = false
         }
     }
 

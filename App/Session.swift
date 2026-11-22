@@ -31,12 +31,13 @@ final class Session {
 
     private var started = false
 
-    /// Only called when the app is in the foreground, so a background relaunch by the
-    /// system never starts location tracking.
+    /// Called whenever the app becomes active. Location only runs while the app is active, so
+    /// no background session exists that could keep or relaunch the app.
     func start() {
-        guard !started, UIApplication.shared.applicationState == .active else { return }
-        started = true
+        guard UIApplication.shared.applicationState == .active else { return }
         location.start()
+        guard !started else { return }
+        started = true
         sequence.start()
         Task { for await key in keyboard.keys { press(key) } }
         Task { await history.load(from: trackStore, maxGap: trackSettings.sanitized.maxGap) }
@@ -67,6 +68,13 @@ final class Session {
 
     func sceneChanged(to phase: ScenePhase) {
         dimmer.sceneChanged(to: phase)
-        if phase != .active { flush() }
+        switch phase {
+        case .active: start()
+        case .inactive: flush()
+        case .background:
+            flush()
+            location.stop()
+        @unknown default: break
+        }
     }
 }
