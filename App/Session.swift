@@ -24,7 +24,9 @@ final class Session {
         track = TrackRecorder(settings: trackSettings, store: trackStore)
 
         sequence.onCommit = { [log, location] label, keys in
-            log.add(LogEntry(timestamp: Date(), label: label, keys: keys, fix: location.latest))
+            log.add(LogEntry(timestamp: Date(), label: label,
+                             csvLabel: SequenceMap.default.csvLabel(for: keys),
+                             keys: keys, fix: location.latest))
         }
         location.onFix = { [track] fix in track.offer(fix) }
     }

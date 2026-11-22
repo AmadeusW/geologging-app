@@ -17,12 +17,15 @@ public struct LocationFix: Equatable {
 public struct LogEntry: Equatable {
     public var timestamp: Date
     public var label: String
+    /// Short label written to the CSV; nil means use `label`.
+    public var csvLabel: String?
     public var keys: [Key]
     public var fix: LocationFix?
 
-    public init(timestamp: Date, label: String, keys: [Key], fix: LocationFix?) {
+    public init(timestamp: Date, label: String, csvLabel: String? = nil, keys: [Key], fix: LocationFix?) {
         self.timestamp = timestamp
         self.label = label
+        self.csvLabel = csvLabel
         self.keys = keys
         self.fix = fix
     }
@@ -38,7 +41,7 @@ public enum CSV {
         for e in entries {
             var fields = [
                 iso.string(from: e.timestamp),
-                escape(e.label),
+                escape(e.csvLabel ?? e.label),
                 e.keys.map { String($0.keypadDigit) }.joined(separator: "-"),
             ]
             if let f = e.fix {
