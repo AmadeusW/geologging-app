@@ -13,11 +13,17 @@ final class LocationService {
     @ObservationIgnored var onFix: ((LocationFix) -> Void)?
 
     // Held for their side effects: ask for permission / keep running in the background.
-    @ObservationIgnored private let authorization = CLServiceSession(authorization: .whenInUse)
-    @ObservationIgnored private let background = CLBackgroundActivitySession()
+    @ObservationIgnored private var authorization: CLServiceSession?
+    @ObservationIgnored private var background: CLBackgroundActivitySession?
+    @ObservationIgnored private var task: Task<Void, Never>?
+
+    var isRunning: Bool { task != nil }
 
     func start() {
-        Task {
+        guard task == nil else { return }
+        authorization = CLServiceSession(authorization: .whenInUse)
+        background = CLBackgroundActivitySession()
+        task = Task {
             do {
                 for try await update in CLLocationUpdate.liveUpdates(.fitness) {
                     isDenied = update.authorizationDenied
@@ -33,5 +39,16 @@ final class LocationService {
                 print("Location updates ended: \(error)")
             }
         }
+    }
+
+    /// Ends updates and releases the sessions, which removes the location indicator and
+    /// stops iOS from relaunching the app in the background.
+    func stop() {
+        task?.cancel()
+        task = nil
+        background?.invalidate()
+        authorization?.invalidate()
+        background = nil
+        authorization = nil
     }
 }

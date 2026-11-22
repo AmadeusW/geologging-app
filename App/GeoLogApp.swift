@@ -8,8 +8,13 @@ struct GeoLogApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(session: session)
-                .task { session.start() }
-                .onChange(of: scenePhase) { _, phase in session.sceneChanged(to: phase) }
+                .onChange(of: scenePhase, initial: true) { _, phase in
+                    if phase == .active { session.start() }
+                    session.sceneChanged(to: phase)
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification)) { _ in
+                    session.terminate()
+                }
         }
     }
 }

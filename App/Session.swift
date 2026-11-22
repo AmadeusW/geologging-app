@@ -29,7 +29,13 @@ final class Session {
         location.onFix = { [track] fix in track.offer(fix) }
     }
 
+    private var started = false
+
+    /// Only called when the app is in the foreground, so a background relaunch by the
+    /// system never starts location tracking.
     func start() {
+        guard !started else { return }
+        started = true
         location.start()
         sequence.start()
         Task { for await key in keyboard.keys { press(key) } }
@@ -51,6 +57,12 @@ final class Session {
     func flush() {
         logStore.save(log.entries)
         track.flush()
+    }
+
+    /// App is being terminated: stop location so no background session outlives it.
+    func terminate() {
+        flush()
+        location.stop()
     }
 
     func sceneChanged(to phase: ScenePhase) {
